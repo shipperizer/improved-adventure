@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/path: /api/v1/metrics
+    prometheus.io/scrape: "true"
+    io.cilium/global-service: "true"  
+  name: improved-adventure-reader
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: improved-adventure-reader
+  type: ClusterIP
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/path: /api/v1/metrics
+    prometheus.io/scrape: "true"
+    io.cilium/global-service: "true"  
+  name: improved-adventure-writer
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: improved-adventure-writer
+  type: ClusterIP
+---

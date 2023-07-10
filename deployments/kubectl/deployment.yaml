@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: improved-adventure-reader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: improved-adventure-reader
+  template:
+    metadata:
+      labels:
+        app: improved-adventure-reader
+      annotations:
+        prometheus.io/path: /api/v1/metrics
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+    spec:
+      volumes:
+        - name: improved-adventure
+          configMap:
+            # Provide the name of the ConfigMap containing the files you want
+            # to add to the container
+            name: improved-adventure
+      containers:
+      - image: ghcr.io/shipperizer/improved-adventure-reader
+        name: improved-adventure-reader
+        envFrom:
+          - configMapRef:
+              name: improved-adventure-reader
+        env:
+          - name: FILE
+            value: /var/app/file.txt
+        volumeMounts:
+        - name: improved-adventure
+          mountPath: /var/app/
+        ports:
+        - name: http
+          containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: "/api/v1/status"
+            port: 8000
+          initialDelaySeconds: 5
+          failureThreshold: 10
+          timeoutSeconds: 5
+          periodSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: "/api/v1/status"
+            port: 8000
+          initialDelaySeconds: 5
+          failureThreshold: 10
+          timeoutSeconds: 5
+          periodSeconds: 30
+      imagePullSecrets:
+      - name: regcred-github
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: improved-adventure-writer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: improved-adventure-writer
+  template:
+    metadata:
+      labels:
+        app: improved-adventure-writer
+      annotations:
+        prometheus.io/path: /api/v1/metrics
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+    spec:
+      containers:
+      - image: ghcr.io/shipperizer/improved-adventure-writer
+        name: improved-adventure-writer
+        envFrom:
+          - configMapRef:
+              name: improved-adventure-writer              
+        ports:
+        - name: http
+          containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: "/api/v1/status"
+            port: 8000
+          initialDelaySeconds: 5
+          failureThreshold: 10
+          timeoutSeconds: 5
+          periodSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: "/api/v1/status"
+            port: 8000
+          initialDelaySeconds: 5
+          failureThreshold: 10
+          timeoutSeconds: 5
+          periodSeconds: 30
+      imagePullSecrets:
+      - name: regcred-github

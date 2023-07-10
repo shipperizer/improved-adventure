@@ -1,0 +1,46 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+build:
+  artifacts:
+  - image: ghcr.io/shipperizer/improved-adventure-reader
+    sync:
+      infer:
+      - "cmd/reader/main.go"
+      - "go.mod"
+      - "go.sum"
+    docker:
+      buildArgs:
+        app_name: reader
+    platforms: ["linux/amd64"]        
+  - image: ghcr.io/shipperizer/improved-adventure-writer
+    sync:
+      infer:
+      - "cmd/writer/main.go"
+      - "go.mod"
+      - "go.sum"
+    docker:
+      buildArgs:
+        app_name: writer
+    platforms: ["linux/amd64"]        
+  local:
+    push: true
+
+
+manifests:
+  rawYaml:
+    - "deployments/kubectl/*"
+
+deploy:
+  kubectl:
+
+portForward:
+- resourceType: service
+  resourceName: improved-adventure-reader
+  namespace: default
+  port: 80
+  localPort: 8000
+- resourceType: service
+  resourceName: improved-adventure-writer
+  namespace: default
+  port: 80
+  localPort: 8001

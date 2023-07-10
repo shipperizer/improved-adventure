@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: improved-adventure-reader
+data:
+  HTTP_PORT: "8000"
+  LOG_LEVEL: ERROR
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: improved-adventure-writer
+data:
+  HTTP_PORT: "8000"
+  LOG_LEVEL: ERROR
+  CONFIGMAP: improved-adventure
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: improved-adventure
+data:
+  "file.txt": |
+    NAME: improved-adventure
+
